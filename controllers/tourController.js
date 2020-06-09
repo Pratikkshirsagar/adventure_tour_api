@@ -1,14 +1,14 @@
-const fs = require("fs");
+const fs = require('fs');
 
 const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/../data/tours-simple.json`),
+  fs.readFileSync(`${__dirname}/../data/tours-simple.json`)
 );
 
 exports.checkID = (req, res, next, val) => {
   if (req.params.id * 1 > tours.length) {
     return res.status(404).json({
-      status: "fail",
-      message: "Incalid ID",
+      status: 'fail',
+      message: 'Incalid ID',
     });
   }
   next();
@@ -19,8 +19,8 @@ exports.checkBody = (req, res, next) => {
 
   if (!name || !price) {
     return res.status(400).json({
-      status: "fail",
-      message: "Missing Name or Price",
+      status: 'fail',
+      message: 'Missing Name or Price',
     });
   }
   next();
@@ -28,7 +28,7 @@ exports.checkBody = (req, res, next) => {
 
 exports.getAllTours = (req, res) => {
   res.status(200).json({
-    status: "success",
+    status: 'success',
     results: tours.length,
     data: {
       tours,
@@ -42,7 +42,7 @@ exports.getTour = (req, res) => {
   const tour = tours.find((el) => el.id === id);
 
   res.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
       tour,
     },
@@ -60,27 +60,27 @@ exports.addTour = (req, res) => {
     JSON.stringify(tours),
     (err) => {
       res.status(201).json({
-        status: "success",
+        status: 'success',
         data: {
           tour: newTour,
         },
       });
-    },
+    }
   );
 };
 
 exports.updateTour = (req, res) => {
   res.status(200).json({
-    status: "success",
+    status: 'success',
     data: {
-      tour: "updated tour",
+      tour: 'updated tour',
     },
   });
 };
 
 exports.deleteTour = (req, res) => {
   res.status(204).json({
-    status: "success",
+    status: 'success',
     data: {
       tour: null,
     },
