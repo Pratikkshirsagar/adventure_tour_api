@@ -59,6 +59,38 @@ app.post('/api/v1/tours', (req, res) => {
   );
 });
 
+app.patch('/api/v1/tours/:id', (req, res) => {
+  if (req.params.id * 1 > tours.length) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Incalid ID',
+    });
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      tour: 'updated tour',
+    },
+  });
+});
+
+app.delete('/api/v1/tours/:id', (req, res) => {
+  if (req.params.id * 1 > tours.length) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Incalid ID',
+    });
+  }
+
+  res.status(204).json({
+    status: 'success',
+    data: {
+      tour: null,
+    },
+  });
+});
+
 const port = 3000;
 app.listen(port, () => {
   console.log(`App running on port ${port}...`);
