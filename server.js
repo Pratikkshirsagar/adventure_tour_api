@@ -1,11 +1,17 @@
 const dotenv = require('dotenv');
 const express = require('express');
 const morgan = require('morgan');
+const colors = require('colors');
 
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
+const connectDB = require('./config/db');
 
-dotenv.config({ path: './config.env' });
+//Load env vars
+dotenv.config({ path: './config/config.env' });
+
+// Connect to database
+connectDB();
 
 const app = express();
 
