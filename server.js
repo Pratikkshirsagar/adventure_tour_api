@@ -3,6 +3,8 @@ const express = require('express');
 const morgan = require('morgan');
 const colors = require('colors');
 
+const AppError = require('./utils/appError');
+const globalErrorHandler = require('./utils/err');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const connectDB = require('./config/db');
@@ -37,11 +39,10 @@ app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 
 app.all('*', (req, res, next) => {
-  res.status(404).json({
-    status: 'fail',
-    message: `Can't find ${req.originalUrl} on this server`,
-  });
+  next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
 });
+
+app.use(globalErrorHandler);
 
 // 4) START SERVER
 const port = process.env.PORT || 3000;
