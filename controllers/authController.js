@@ -1,9 +1,7 @@
-const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
-const { decode } = require('punycode');
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -64,7 +62,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   if (!token) {
     return next(
-      new AppError('You  are not logged in! Please log in to get access', 401)
+      new AppError('You are not logged in! Please log in to get access', 401)
     );
   }
 
@@ -72,8 +70,6 @@ exports.protect = catchAsync(async (req, res, next) => {
   let decoded;
   try {
     decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    console.log(decoded);
   } catch (error) {
     console.log(next(new AppError(`Not autherize to access this route`, 401)));
   }
@@ -100,3 +96,14 @@ exports.protect = catchAsync(async (req, res, next) => {
   req.user = freshUser;
   next();
 });
+
+exports.restricTo = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError('You do not have permission to perform this action', 403)
+      );
+    }
+    next();
+  };
+};
