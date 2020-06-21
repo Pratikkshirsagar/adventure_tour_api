@@ -3,6 +3,7 @@ const express = require('express');
 const morgan = require('morgan');
 const colors = require('colors');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./utils/err');
@@ -19,12 +20,18 @@ connectDB();
 const app = express();
 
 // 1) Global Middlewares
-app.use(express.json());
+
+// body parser
+app.use(express.json({ limit: '10kb' }));
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
+// security http headers
+app.use(helmet());
+
+// limit requiest from same api
 const limiter = rateLimit({
   max: 100,
   windowMs: 60 * 60 * 1000,
@@ -33,6 +40,7 @@ const limiter = rateLimit({
 
 app.use('/api', limiter);
 
+// test midleware
 app.use((req, res, next) => {
   console.log('Hello from the middleware');
   next();
