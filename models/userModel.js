@@ -49,11 +49,18 @@ userSchema.pre('save', async function (next) {
   // only run this function if password was actualy modified
   if (!this.isModified('password')) return next();
 
-  // HAsh the password
+  // Hash the password
   this.password = await bcrypt.hash(this.password, 12);
   // delete the confirm password
   this.passwordConfirm = undefined;
 
+  next();
+});
+
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
+
+  this.passwordChangedAt = Date.now() - 1000;
   next();
 });
 
