@@ -4,12 +4,22 @@ const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const sendEmail = require('../utils/email');
 const crypto = require('crypto');
-const { hash } = require('bcryptjs');
-const { url } = require('inspector');
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+};
+
+const createAndSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+
+  res.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user,
+    },
   });
 };
 
@@ -21,15 +31,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     passwordConfirm: req.body.passwordConfirm,
   });
 
-  const token = signToken(newUser._id);
-
-  res.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      user: newUser,
-    },
-  });
+  createAndSendToken(newUser, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -47,11 +49,7 @@ exports.login = catchAsync(async (req, res, next) => {
   }
 
   // 3) Id everything ok, send token to client
-  const token = signToken(user._id);
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  createAndSendToken(user, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -178,10 +176,25 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   // 3) Update changePassword property of the user
   // 4) Log the user in and send JWT
-  const token = signToken(user._id);
+  createAndSendToken(user, 200, res);
+});
 
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  const { passwordCurrent, password, passwordConfirm } = req.body;
+
+  // 1) get the use from collection
+  const user = await User.findById(req.user.id).select('+password');
+
+  // 2) Check if POSTED current password is correct
+  if (!user.correctPassword(passwordCurrent, password)) {
+    return next(new AppError('Your current password is wrong.', 401));
+  }
+
+  // 3) if the password is correct  update the password
+  user.password = password;
+  user.passwordConfirm = passwordConfirm;
+  await user.save();
+
+  // 4) Log the user in and send the JWT back to user
+  createAndSendToken(user, 200, res);
 });
