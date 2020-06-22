@@ -33,14 +33,16 @@ router.post('/forgotpassword', forgotPassword);
 
 router.patch('/resetpassword/:token', resetPassword);
 
-router.post('/updatepassword', protect, updatePassword);
+router.use(protect);
 
-router.patch('/updateme', protect, updateMe);
-
-router.delete('/deleteme', protect, deleteMe);
+router.post('/updatepassword', updatePassword);
 
 router.route('/').get(getAllUsers).post(createUser);
 
 router.route('/:id').get(getUser).patch(updateUser).delete(deleteUser);
+
+router.patch('/updateme', updateMe);
+
+router.delete('/deleteme', deleteMe);
 
 module.exports = router;
