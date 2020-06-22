@@ -1,7 +1,7 @@
 const Review = require('../models/reviewModel');
 const catchAsync = require('../utils/catchAsync');
-const APIFeatures = require('../utils/apiFeatures');
 const AppError = require('../utils/appError');
+const factory = require('./handlerFactory');
 
 exports.getAllReview = catchAsync(async (req, res, next) => {
   let filter = {};
@@ -66,15 +66,17 @@ exports.updateReview = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.deleteReview = catchAsync(async (req, res, next) => {
-  const review = await Review.findByIdAndDelete(req.params.id);
+exports.deleteReview = factory.deleteOne(Review);
 
-  if (!review) {
-    return next(new AppError('No review found with that ID', 404));
-  }
+// exports.deleteReview = catchAsync(async (req, res, next) => {
+//   const review = await Review.findByIdAndDelete(req.params.id);
 
-  res.status(204).json({
-    status: 'success',
-    data: null,
-  });
-});
+//   if (!review) {
+//     return next(new AppError('No review found with that ID', 404));
+//   }
+
+//   res.status(204).json({
+//     status: 'success',
+//     data: null,
+//   });
+// });
