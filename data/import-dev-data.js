@@ -13,9 +13,7 @@ mongoose.connect(process.env.DATABASE_LOCAL, {
   useUnifiedTopology: true,
 });
 
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/tours-simple.json`, `utf-8`)
-);
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, `utf-8`));
 
 // IMPORT ALL DATA TO DB
 const importData = async () => {
