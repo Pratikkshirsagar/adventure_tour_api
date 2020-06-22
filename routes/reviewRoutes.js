@@ -7,9 +7,14 @@ const {
   deleteReview,
 } = require('../controllers/reviewController');
 
-const router = express.Router();
+const { protect, restricTo } = require('../controllers/authController');
 
-router.route('/').get(getAllReview).post(createReview);
+const router = express.Router({ mergeParams: true });
+
+router
+  .route('/')
+  .get(getAllReview)
+  .post(protect, restricTo('user'), createReview);
 
 router.route('/:id').get(getReview).patch(updateReview).delete(deleteReview);
 
